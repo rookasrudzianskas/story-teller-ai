@@ -51,6 +51,7 @@ export function getAllStories(): Story[] {
   });
 
   const storiesWithPages = stories.filter((story) => story.pages.length > 0);
+  return storiesWithPages;
 }
 
 export const getStory = (story: string): Story | undefined => {
