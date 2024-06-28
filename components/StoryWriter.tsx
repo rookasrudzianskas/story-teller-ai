@@ -4,6 +4,9 @@ import React, {useState} from 'react';
 import {Textarea} from "@/components/ui/textarea";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Button} from "@/components/ui/button";
+import {TextDecoder} from "node:util";
+import {ReadableStreamDefaultReader} from "node:stream/web";
+import {Frame} from "@gptscript-ai/gptscript";
 
 const storiesPath = 'public/stories'
 
@@ -14,6 +17,7 @@ const StoryWriter = ({}) => {
   const [runStarted, setRunStarted] = useState<boolean>(false);
   const [runFinished, setRunFinished] = useState<boolean | null>(null);
   const [currentTool, setCurrentTool] = useState<string>('');
+  const [events, setEvents] = useState<Frame[]>([]);
 
   async function runScript() {
     setRunStarted(true);
@@ -30,6 +34,53 @@ const StoryWriter = ({}) => {
         path: storiesPath,
       }),
     })
+
+    if(response.ok && response.body) {
+      console.log("Streaming started");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      handleStream(reader, decoder);
+    } else {
+      setRunFinished(true);
+      setRunStarted(false);
+      console.error('Failed to run script');
+    }
+  }
+
+  async function handleStream (reader: ReadableStreamDefaultReader<Uint8Array>, decoder: TextDecoder) {
+    // manage the stream from the api
+    while(true) {
+      const { done, value } = await reader.read();
+      if(done) break; // breaks out of the loop if the stream is done
+
+      const chunk = decoder.decode(value, { stream: true });
+      // We split chunk into events by event
+      const eventData = chunk.split('\n\n').filter((line) => line.startsWith("event: ")).map((line) => line.replace(/^event: /, ""));
+      eventData.forEach((data) => {
+        try {
+          const parsedData = JSON.parse(data);
+
+          if(parsedData.type === 'callProgress') {
+            setProgress(
+              parsedData.output[parsedData.output.length - 1].content
+            );
+            setCurrentTool(parsedData.tool?.description || "");
+          } else if (parsedData === "callStart") {
+            setCurrentTool(parsedData.tool?.description || "");
+          } else if (parsedData.type === "runFinish") {
+            setRunFinished(true);
+
+            setRunStarted(false);
+          } else {
+            setEvents((prevEvents) => [...prevEvents, parsedData]);
+          }
+        } catch(error) {
+          console.error("Failed to parse jsn", error);
+        }
+      })
+    }
   }
 
   return (
