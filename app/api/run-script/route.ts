@@ -1,7 +1,7 @@
 import {NextRequest} from "next/server";
 import {RunEventType, RunOpts} from "@gptscript-ai/gptscript";
-import {ReadableStream} from "node:stream/web";
 import g from "@/lib/gptScriptInstance";
+// import {ReadableStream} from "node:stream/web";
 
 const script = "app/api/run-script/story-book.gpt";
 

@@ -4,9 +4,10 @@ import React, {useState} from 'react';
 import {Textarea} from "@/components/ui/textarea";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Button} from "@/components/ui/button";
-import {TextDecoder} from "node:util";
-import {ReadableStreamDefaultReader} from "node:stream/web";
+// import {TextDecoder} from "node:util";
+// import {ReadableStreamDefaultReader} from "node:stream/web";
 import {Frame} from "@gptscript-ai/gptscript";
+import renderEventMessage from "@/lib/renderEventMessage";
 
 const storiesPath = 'public/stories'
 
@@ -141,6 +142,17 @@ const StoryWriter = ({}) => {
           )}
 
         {/*  Render Events  */}
+
+          <div className={'space-y-5'}>
+            {events.map((event, index) => (
+              <div key={index}>
+                <span className={'mr-5'}>
+                  {">>"}
+                </span>
+                {renderEventMessage(event)}
+              </div>
+            ))}
+          </div>
 
         {runStarted && (
           <div>
