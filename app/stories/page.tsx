@@ -14,8 +14,9 @@ const Stories = ({}) => {
     <div className={'p-10 max-w-7xl mx-auto'}>
       {stories.length === 0 && <p>No stories found.</p>}
       <div className={'grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5'}>
-        {stories.map((story) => (
-          <Link className={'border rounded-lg cursor-pointer hover:shadow-lg hover:border-purple-500 transition-all' +
+        {stories.map((story, index) => (
+          <Link key={index} className={'border rounded-lg cursor-pointer hover:shadow-lg hover:border-purple-500' +
+            ' transition-all' +
             ' duration-300 ease-in-out'} href={`/stories/${story.story}`}>
             <div className={'relative'}>
               <p className={'absolute flex items-center top-0 right-0 bg-white text-purple-500 font-bold p-3' +

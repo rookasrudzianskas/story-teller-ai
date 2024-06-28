@@ -100,7 +100,7 @@ const StoryWriter = ({}) => {
         )
       })
     }
-  }, [runFinished]);
+  }, [runFinished, router]);
 
   return (
     <div className={'flex flex-col container'}>
