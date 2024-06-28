@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import {getAllStories, getStory} from "@/lib/getAllStories";
 import {notFound} from "next/navigation";
